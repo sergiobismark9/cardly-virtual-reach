@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,9 +15,11 @@ import {
   Menu,
   X
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -52,8 +53,17 @@ const Dashboard = () => {
         </div>
 
         <nav className="p-4 space-y-2">
-          <SidebarItem icon={<LayoutDashboard className="h-5 w-5" />} label="Dashboard" active />
-          <SidebarItem icon={<CreditCard className="h-5 w-5" />} label="Meus Cartões" />
+          <SidebarItem 
+            icon={<LayoutDashboard className="h-5 w-5" />} 
+            label="Dashboard" 
+            active 
+            onClick={() => navigate('/dashboard')}
+          />
+          <SidebarItem 
+            icon={<CreditCard className="h-5 w-5" />} 
+            label="Meus Cartões" 
+            onClick={() => navigate('/cards')}
+          />
           <SidebarItem icon={<Users className="h-5 w-5" />} label="Contatos" />
           <SidebarItem icon={<BarChart3 className="h-5 w-5" />} label="Analytics" />
           <SidebarItem icon={<Settings className="h-5 w-5" />} label="Configurações" />
@@ -145,7 +155,10 @@ const Dashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button className="w-full justify-start bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                <Button 
+                  className="w-full justify-start bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  onClick={() => navigate('/cards/new')}
+                >
                   <Plus className="h-4 w-4 mr-2" />
                   Criar Novo Cartão
                 </Button>
@@ -220,12 +233,20 @@ const Dashboard = () => {
   );
 };
 
-const SidebarItem = ({ icon, label, active = false }: { icon: React.ReactNode, label: string, active?: boolean }) => (
-  <button className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
-    active 
-      ? 'bg-blue-50 text-blue-700 border border-blue-200' 
-      : 'text-gray-700 hover:bg-gray-100'
-  }`}>
+const SidebarItem = ({ icon, label, active = false, onClick }: { 
+  icon: React.ReactNode, 
+  label: string, 
+  active?: boolean,
+  onClick?: () => void 
+}) => (
+  <button 
+    onClick={onClick}
+    className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
+      active 
+        ? 'bg-blue-50 text-blue-700 border border-blue-200' 
+        : 'text-gray-700 hover:bg-gray-100'
+    }`}
+  >
     {icon}
     <span className="font-medium">{label}</span>
   </button>
