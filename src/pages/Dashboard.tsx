@@ -13,7 +13,8 @@ import {
   Bell,
   Search,
   Menu,
-  X
+  X,
+  Shield
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -69,7 +70,16 @@ const Dashboard = () => {
             label="Contatos" 
             onClick={() => navigate('/contacts')}
           />
-          <SidebarItem icon={<BarChart3 className="h-5 w-5" />} label="Analytics" />
+          <SidebarItem 
+            icon={<BarChart3 className="h-5 w-5" />} 
+            label="Analytics" 
+            onClick={() => navigate('/analytics')}
+          />
+          <SidebarItem 
+            icon={<Shield className="h-5 w-5" />} 
+            label="Admin" 
+            onClick={() => navigate('/admin')}
+          />
           <SidebarItem icon={<Settings className="h-5 w-5" />} label="Configurações" />
         </nav>
 
@@ -170,9 +180,13 @@ const Dashboard = () => {
                   <Share2 className="h-4 w-4 mr-2" />
                   Compartilhar Cartão
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Users className="h-4 w-4 mr-2" />
-                  Adicionar Contato
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => navigate('/analytics')}
+                >
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Ver Analytics
                 </Button>
               </CardContent>
             </Card>
