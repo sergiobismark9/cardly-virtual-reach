@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Cards from "./pages/Cards";
 import CreateCard from "./pages/CreateCard";
 import CardViewer from "./pages/CardViewer";
+import Contacts from "./pages/Contacts";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/cards" element={<Cards />} />
           <Route path="/cards/new" element={<CreateCard />} />
           <Route path="/cards/edit/:id" element={<CreateCard />} />
+          <Route path="/contacts" element={<Contacts />} />
           <Route path="/c/:slug" element={<CardViewer />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

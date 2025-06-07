@@ -64,7 +64,11 @@ const Dashboard = () => {
             label="Meus Cartões" 
             onClick={() => navigate('/cards')}
           />
-          <SidebarItem icon={<Users className="h-5 w-5" />} label="Contatos" />
+          <SidebarItem 
+            icon={<Users className="h-5 w-5" />} 
+            label="Contatos" 
+            onClick={() => navigate('/contacts')}
+          />
           <SidebarItem icon={<BarChart3 className="h-5 w-5" />} label="Analytics" />
           <SidebarItem icon={<Settings className="h-5 w-5" />} label="Configurações" />
         </nav>

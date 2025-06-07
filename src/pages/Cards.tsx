@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Edit, Eye, Share2, Trash2, Copy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 interface CardData {
   id: string;
@@ -18,6 +18,7 @@ interface CardData {
 
 const Cards = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [cards] = useState<CardData[]>([
     {
       id: '1',
@@ -44,7 +45,10 @@ const Cards = () => {
   const handleCopyLink = (slug: string) => {
     const link = `${window.location.origin}/c/${slug}`;
     navigator.clipboard.writeText(link);
-    // TODO: Add toast notification
+    toast({
+      title: "Link copiado!",
+      description: "O link do cartão foi copiado para a área de transferência.",
+    });
   };
 
   const handleShare = (slug: string) => {
