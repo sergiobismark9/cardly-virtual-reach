@@ -1,127 +1,250 @@
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Eye, Share2, Users, Zap, ArrowRight, Star, Shield, Smartphone } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  CreditCard, 
+  Smartphone, 
+  Share2, 
+  BarChart3, 
+  Check,
+  ArrowRight,
+  Zap,
+  Globe,
+  Shield
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState<'login' | 'register' | 'landing'>('landing');
-
-  if (currentView === 'login') {
-    return <LoginPage onBack={() => setCurrentView('landing')} onRegister={() => setCurrentView('register')} />;
-  }
-
-  if (currentView === 'register') {
-    return <RegisterPage onBack={() => setCurrentView('landing')} onLogin={() => setCurrentView('login')} />;
-  }
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       {/* Header */}
-      <header className="border-b border-blue-100 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">VC</span>
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              VirtualCardPro
-            </span>
+      <header className="container mx-auto px-4 py-6">
+        <div className="flex justify-between items-center">
+          <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Cartões Virtuais
           </div>
-          <div className="flex space-x-2">
-            <Button variant="ghost" onClick={() => setCurrentView('login')}>
-              Entrar
-            </Button>
-            <Button onClick={() => setCurrentView('register')} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-              Começar Grátis
-            </Button>
+          <div className="space-x-4">
+            {user ? (
+              <Button onClick={() => navigate('/dashboard')}>
+                Acessar Dashboard
+              </Button>
+            ) : (
+              <>
+                <Button variant="outline" onClick={() => navigate('/auth')}>
+                  Entrar
+                </Button>
+                <Button onClick={() => navigate('/auth')} className="bg-gradient-to-r from-blue-600 to-purple-600">
+                  Começar Grátis
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 text-center">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent leading-tight">
-            Seus Cartões de Visita
-            <br />
-            <span className="text-4xl md:text-5xl">Agora São Digitais</span>
-          </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Crie cartões de visita virtuais interativos, compartilhe via WhatsApp ou link, e acompanhe suas visualizações em tempo real.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              onClick={() => setCurrentView('register')}
-              size="lg" 
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-8 py-6"
-            >
-              Criar Meu Cartão Grátis
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-2">
-              Ver Demonstração
-            </Button>
-          </div>
+        <h1 className="text-5xl font-bold text-gray-900 mb-6">
+          Seus cartões de visita
+          <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            100% digitais
+          </span>
+        </h1>
+        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          Crie, compartilhe e gerencie seus cartões de visita virtuais de forma simples e profissional. 
+          Sem papel, sem desperdício, com total controle.
+        </p>
+        <div className="space-x-4">
+          <Button 
+            size="lg" 
+            onClick={() => navigate('/auth')}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-3"
+          >
+            Criar Meu Cartão Grátis
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="lg">
+            Ver Demonstração
+          </Button>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">
-          Tudo que você precisa em um só lugar
-        </h2>
-        <div className="grid md:grid-cols-3 gap-8">
-          <FeatureCard
-            icon={<Smartphone className="h-8 w-8" />}
-            title="Design Responsivo"
-            description="Seus cartões ficam perfeitos em qualquer dispositivo - celular, tablet ou desktop."
-          />
-          <FeatureCard
-            icon={<Share2 className="h-8 w-8" />}
-            title="Compartilhamento Fácil"
-            description="Envie por WhatsApp, email ou copie o link. Simples assim."
-          />
-          <FeatureCard
-            icon={<Eye className="h-8 w-8" />}
-            title="Analytics em Tempo Real"
-            description="Veja quantas pessoas visualizaram seu cartão e clicaram nos seus links."
-          />
-          <FeatureCard
-            icon={<Users className="h-8 w-8" />}
-            title="Gestão de Contatos"
-            description="Organize todos os contatos que interagiram com seus cartões."
-          />
-          <FeatureCard
-            icon={<Zap className="h-8 w-8" />}
-            title="Links Interativos"
-            description="Telefone, WhatsApp, email, site e redes sociais - tudo clicável."
-          />
-          <FeatureCard
-            icon={<Shield className="h-8 w-8" />}
-            title="Seguro e Confiável"
-            description="Seus dados estão protegidos com a melhor tecnologia de segurança."
-          />
+      {/* Features Section */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Tudo que você precisa para se destacar
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Recursos profissionais para criar uma presença digital marcante
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="text-center hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <CreditCard className="h-6 w-6 text-blue-600" />
+              </div>
+              <CardTitle className="text-lg">Design Profissional</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 text-sm">
+                Templates modernos e personalizáveis para todos os tipos de profissional
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Smartphone className="h-6 w-6 text-green-600" />
+              </div>
+              <CardTitle className="text-lg">Mobile First</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 text-sm">
+                Perfeito em qualquer dispositivo, especialmente otimizado para mobile
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Share2 className="h-6 w-6 text-purple-600" />
+              </div>
+              <CardTitle className="text-lg">Compartilhamento Fácil</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 text-sm">
+                QR Code, link direto, WhatsApp e integração com redes sociais
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <BarChart3 className="h-6 w-6 text-orange-600" />
+              </div>
+              <CardTitle className="text-lg">Analytics Completo</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 text-sm">
+                Visualizações, cliques e insights sobre o desempenho dos seus cartões
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Planos para todos os perfis
+          </h2>
+          <p className="text-gray-600">
+            Comece grátis e evolua conforme sua necessidade
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {/* Free Plan */}
+          <Card className="relative">
+            <CardHeader>
+              <CardTitle className="text-2xl">Plano Gratuito</CardTitle>
+              <div className="text-3xl font-bold">R$ 0<span className="text-lg text-gray-600">/mês</span></div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <Check className="h-4 w-4 text-green-600 mr-2" />
+                  <span className="text-sm">Até 3 cartões virtuais</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="h-4 w-4 text-green-600 mr-2" />
+                  <span className="text-sm">Templates básicos</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="h-4 w-4 text-green-600 mr-2" />
+                  <span className="text-sm">QR Code incluído</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="h-4 w-4 text-green-600 mr-2" />
+                  <span className="text-sm">Analytics básico</span>
+                </div>
+              </div>
+              <Button className="w-full" variant="outline" onClick={() => navigate('/auth')}>
+                Começar Grátis
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Premium Plan */}
+          <Card className="relative border-blue-200 shadow-lg">
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-1 rounded-full text-sm font-medium">
+                Mais Popular
+              </span>
+            </div>
+            <CardHeader>
+              <CardTitle className="text-2xl">Plano Premium</CardTitle>
+              <div className="text-3xl font-bold">R$ 29<span className="text-lg text-gray-600">/mês</span></div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <Check className="h-4 w-4 text-green-600 mr-2" />
+                  <span className="text-sm">Cartões ilimitados</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="h-4 w-4 text-green-600 mr-2" />
+                  <span className="text-sm">Templates premium</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="h-4 w-4 text-green-600 mr-2" />
+                  <span className="text-sm">Analytics avançado</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="h-4 w-4 text-green-600 mr-2" />
+                  <span className="text-sm">Domínio personalizado</span>
+                </div>
+                <div className="flex items-center">
+                  <Check className="h-4 w-4 text-green-600 mr-2" />
+                  <span className="text-sm">Suporte prioritário</span>
+                </div>
+              </div>
+              <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600" onClick={() => navigate('/auth')}>
+                Começar Premium
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-purple-600 py-16">
+      <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Pronto para revolucionar seus cartões de visita?
+          <h2 className="text-3xl font-bold mb-4">
+            Pronto para modernizar seus cartões?
           </h2>
-          <p className="text-blue-100 mb-8 text-lg">
-            Junte-se a milhares de profissionais que já modernizaram sua forma de fazer networking.
+          <p className="text-xl mb-8 opacity-90">
+            Junte-se a milhares de profissionais que já fazem a diferença
           </p>
           <Button 
-            onClick={() => setCurrentView('register')}
             size="lg" 
             variant="secondary"
-            className="bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-6"
+            onClick={() => navigate('/auth')}
+            className="px-8 py-3"
           >
-            Começar Agora - É Grátis
-            <ArrowRight className="ml-2 h-5 w-5" />
+            Criar Meu Primeiro Cartão
+            <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
       </section>
@@ -129,200 +252,23 @@ const Index = () => {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">VC</span>
-              </div>
-              <span className="text-xl font-bold">VirtualCardPro</span>
+          <div className="text-center">
+            <div className="text-2xl font-bold mb-4">Cartões Virtuais</div>
+            <p className="text-gray-400 mb-6">
+              A forma mais moderna de compartilhar suas informações profissionais
+            </p>
+            <div className="flex justify-center space-x-6 text-gray-400">
+              <a href="#" className="hover:text-white">Sobre</a>
+              <a href="#" className="hover:text-white">Contato</a>
+              <a href="#" className="hover:text-white">Privacidade</a>
+              <a href="#" className="hover:text-white">Termos</a>
             </div>
-            <div className="text-gray-400">
-              © 2024 VirtualCardPro. Todos os direitos reservados.
+            <div className="mt-8 pt-8 border-t border-gray-700 text-gray-400 text-sm">
+              © 2024 Cartões Virtuais. Todos os direitos reservados.
             </div>
           </div>
         </div>
       </footer>
-    </div>
-  );
-};
-
-const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
-  <Card className="p-6 hover:shadow-lg transition-shadow border-0 bg-white/80 backdrop-blur-sm">
-    <CardContent className="p-0">
-      <div className="text-blue-600 mb-4">{icon}</div>
-      <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <p className="text-gray-600">{description}</p>
-    </CardContent>
-  </Card>
-);
-
-const LoginPage = ({ onBack, onRegister }: { onBack: () => void, onRegister: () => void }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleLogin = () => {
-    // Simular login bem-sucedido
-    if (email && password) {
-      window.location.href = '/dashboard';
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-white/90 backdrop-blur-sm shadow-xl border-0">
-        <CardContent className="p-8">
-          <div className="text-center mb-8">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <span className="text-white font-bold">VC</span>
-            </div>
-            <h1 className="text-2xl font-bold">Bem-vindo de volta</h1>
-            <p className="text-gray-600">Entre na sua conta para continuar</p>
-          </div>
-
-          <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="seu@email.com"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Senha</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Sua senha"
-                required
-              />
-            </div>
-
-            <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 py-3">
-              Entrar
-            </Button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
-              Não tem uma conta?{' '}
-              <button onClick={onRegister} className="text-blue-600 hover:text-blue-700 font-medium">
-                Registre-se
-              </button>
-            </p>
-            <button onClick={onBack} className="mt-2 text-gray-500 hover:text-gray-600 text-sm">
-              ← Voltar ao início
-            </button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
-
-const RegisterPage = ({ onBack, onLogin }: { onBack: () => void, onLogin: () => void }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  });
-
-  const handleRegister = () => {
-    if (formData.password === formData.confirmPassword && formData.email && formData.name) {
-      window.location.href = '/dashboard';
-    }
-  };
-
-  const updateField = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-white/90 backdrop-blur-sm shadow-xl border-0">
-        <CardContent className="p-8">
-          <div className="text-center mb-8">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <span className="text-white font-bold">VC</span>
-            </div>
-            <h1 className="text-2xl font-bold">Criar conta</h1>
-            <p className="text-gray-600">Comece a criar seus cartões virtuais</p>
-          </div>
-
-          <form onSubmit={(e) => { e.preventDefault(); handleRegister(); }} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Nome completo</label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => updateField('name', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Seu nome"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Email</label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => updateField('email', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="seu@email.com"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Senha</label>
-              <input
-                type="password"
-                value={formData.password}
-                onChange={(e) => updateField('password', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Mínimo 8 caracteres"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Confirmar senha</label>
-              <input
-                type="password"
-                value={formData.confirmPassword}
-                onChange={(e) => updateField('confirmPassword', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Confirme sua senha"
-                required
-              />
-            </div>
-
-            <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 py-3">
-              Criar Conta
-            </Button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
-              Já tem uma conta?{' '}
-              <button onClick={onLogin} className="text-blue-600 hover:text-blue-700 font-medium">
-                Fazer login
-              </button>
-            </p>
-            <button onClick={onBack} className="mt-2 text-gray-500 hover:text-gray-600 text-sm">
-              ← Voltar ao início
-            </button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };
