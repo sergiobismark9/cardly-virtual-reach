@@ -1,53 +1,68 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Save, Eye, Upload } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-
-interface CardFormData {
-  title: string;
-  slug: string;
-  name: string;
-  position: string;
-  company: string;
-  phone: string;
-  whatsapp: string;
-  email: string;
-  website: string;
-  linkedin: string;
-  instagram: string;
-  facebook: string;
-  photo: string;
-  logo: string;
-  frontMessage: string;
-  backMessage: string;
-  status: 'draft' | 'published';
-}
+import { ArrowLeft, Save, Eye } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useCards, Card as CardType } from "@/hooks/useCards";
+import { useAuth } from "@/contexts/AuthContext";
+import ImageUpload from "@/components/ImageUpload";
+import CardTemplates, { Template } from "@/components/CardTemplates";
+import CardPreview from "@/components/CardPreview";
+import QRCodeGenerator from "@/components/QRCodeGenerator";
 
 const CreateCard = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<CardFormData>({
+  const { id } = useParams();
+  const { user } = useAuth();
+  const { createCard, updateCard, cards } = useCards();
+  const isEditing = !!id;
+
+  const [formData, setFormData] = useState({
     title: '',
     slug: '',
     name: '',
     position: '',
     company: '',
     phone: '',
-    whatsapp: '',
     email: '',
     website: '',
-    linkedin: '',
-    instagram: '',
-    facebook: '',
-    photo: '',
-    logo: '',
-    frontMessage: '',
-    backMessage: 'Obrigado por visitar meu cartão!',
-    status: 'draft'
+    description: '',
+    avatar_url: '',
+    cover_image_url: '',
+    social_links: {},
+    template_style: {},
+    is_published: false
   });
 
-  const updateField = (field: keyof CardFormData, value: string) => {
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [loading, setSaveLoading] = useState(false);
+
+  useEffect(() => {
+    if (isEditing && cards.length > 0) {
+      const card = cards.find(c => c.id === id);
+      if (card) {
+        setFormData({
+          title: card.title,
+          slug: card.slug,
+          name: card.name,
+          position: card.position || '',
+          company: card.company || '',
+          phone: card.phone || '',
+          email: card.email || '',
+          website: card.website || '',
+          description: card.description || '',
+          avatar_url: card.avatar_url || '',
+          cover_image_url: card.cover_image_url || '',
+          social_links: card.social_links || {},
+          template_style: card.template_style || {},
+          is_published: card.is_published
+        });
+      }
+    }
+  }, [isEditing, id, cards]);
+
+  const updateField = (field: string, value: any) => {
     setFormData(prev => {
       const updated = { ...prev, [field]: value };
       
@@ -66,16 +81,31 @@ const CreateCard = () => {
     });
   };
 
-  const handleSave = (status: 'draft' | 'published') => {
-    // TODO: Save to database
-    console.log('Saving card:', { ...formData, status });
-    navigate('/cards');
+  const handleTemplateSelect = (template: Template) => {
+    setSelectedTemplate(template);
+    updateField('template_style', template.style);
   };
 
-  const handlePreview = () => {
-    // TODO: Open preview modal or navigate to preview
-    console.log('Preview card:', formData);
+  const handleSave = async (publish: boolean = false) => {
+    try {
+      setSaveLoading(true);
+      const cardData = { ...formData, is_published: publish };
+      
+      if (isEditing) {
+        await updateCard(id!, cardData);
+      } else {
+        await createCard(cardData);
+      }
+      
+      navigate('/cards');
+    } catch (error) {
+      console.error('Erro ao salvar:', error);
+    } finally {
+      setSaveLoading(false);
+    }
   };
+
+  const cardUrl = formData.slug ? `${window.location.origin}/c/${formData.slug}` : '';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -88,27 +118,29 @@ const CreateCard = () => {
               Voltar
             </Button>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Novo Cartão</h1>
-              <p className="text-gray-600 mt-1">Crie seu cartão de visita virtual</p>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {isEditing ? 'Editar Cartão' : 'Novo Cartão'}
+              </h1>
+              <p className="text-gray-600 mt-1">
+                {isEditing ? 'Atualize as informações do seu cartão' : 'Crie seu cartão de visita virtual'}
+              </p>
             </div>
           </div>
           <div className="flex space-x-2">
-            <Button variant="outline" onClick={handlePreview}>
-              <Eye className="h-4 w-4 mr-2" />
-              Visualizar
-            </Button>
             <Button 
               variant="outline" 
-              onClick={() => handleSave('draft')}
+              onClick={() => handleSave(false)}
+              disabled={loading}
             >
               <Save className="h-4 w-4 mr-2" />
               Salvar Rascunho
             </Button>
             <Button 
-              onClick={() => handleSave('published')}
+              onClick={() => handleSave(true)}
+              disabled={loading}
               className="bg-gradient-to-r from-blue-600 to-purple-600"
             >
-              Publicar Cartão
+              {loading ? 'Salvando...' : 'Publicar Cartão'}
             </Button>
           </div>
         </div>
@@ -188,16 +220,17 @@ const CreateCard = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Contact Info */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Informações de Contato</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Email</label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => updateField('email', e.target.value)}
+                      placeholder="seu@email.com"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
                   <div>
                     <label className="block text-sm font-medium mb-2">Telefone</label>
                     <input
@@ -208,26 +241,6 @@ const CreateCard = () => {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">WhatsApp</label>
-                    <input
-                      type="tel"
-                      value={formData.whatsapp}
-                      onChange={(e) => updateField('whatsapp', e.target.value)}
-                      placeholder="5511999999999"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Email</label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => updateField('email', e.target.value)}
-                    placeholder="seu@email.com"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">Website</label>
@@ -242,44 +255,35 @@ const CreateCard = () => {
               </CardContent>
             </Card>
 
-            {/* Social Media */}
+            {/* Images */}
             <Card>
               <CardHeader>
-                <CardTitle>Redes Sociais</CardTitle>
+                <CardTitle>Imagens</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">LinkedIn</label>
-                  <input
-                    type="url"
-                    value={formData.linkedin}
-                    onChange={(e) => updateField('linkedin', e.target.value)}
-                    placeholder="https://linkedin.com/in/seuperfil"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  <label className="block text-sm font-medium mb-2">Foto de Perfil</label>
+                  <ImageUpload
+                    currentImage={formData.avatar_url}
+                    onImageChange={(url) => updateField('avatar_url', url)}
+                    folder="avatars"
+                    aspectRatio="square"
                   />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Instagram</label>
-                    <input
-                      type="text"
-                      value={formData.instagram}
-                      onChange={(e) => updateField('instagram', e.target.value)}
-                      placeholder="@seuusuario"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Facebook</label>
-                    <input
-                      type="text"
-                      value={formData.facebook}
-                      onChange={(e) => updateField('facebook', e.target.value)}
-                      placeholder="facebook.com/seuusuario"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
+              </CardContent>
+            </Card>
+
+            {/* Templates */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Template do Cartão</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardTemplates
+                  selectedTemplate={selectedTemplate?.id}
+                  onTemplateSelect={handleTemplateSelect}
+                  userPlan={user?.user_metadata?.plan || 'free'}
+                />
               </CardContent>
             </Card>
           </div>
@@ -291,74 +295,21 @@ const CreateCard = () => {
                 <CardTitle>Visualização do Cartão</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-lg">
-                  {/* Card Preview */}
-                  <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm mx-auto">
-                    {/* Front of card */}
-                    <div className="text-center space-y-4">
-                      <div className="w-20 h-20 bg-gray-200 rounded-full mx-auto flex items-center justify-center">
-                        {formData.photo ? (
-                          <img src={formData.photo} alt="Foto" className="w-full h-full rounded-full object-cover" />
-                        ) : (
-                          <span className="text-gray-400 text-xs">Foto</span>
-                        )}
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-900">
-                          {formData.name || 'Seu Nome'}
-                        </h3>
-                        <p className="text-gray-600">
-                          {formData.position || 'Sua Posição'}
-                        </p>
-                        {formData.company && (
-                          <p className="text-sm text-gray-500">{formData.company}</p>
-                        )}
-                      </div>
-                      <div className="flex justify-center space-x-4 text-sm">
-                        {formData.phone && (
-                          <a href={`tel:${formData.phone}`} className="text-blue-600">
-                            Ligar
-                          </a>
-                        )}
-                        {formData.whatsapp && (
-                          <a href={`https://wa.me/${formData.whatsapp}`} className="text-green-600">
-                            WhatsApp
-                          </a>
-                        )}
-                        {formData.email && (
-                          <a href={`mailto:${formData.email}`} className="text-red-600">
-                            Email
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <CardPreview data={formData} />
               </CardContent>
             </Card>
 
-            {/* Images Upload */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Imagens</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Foto Pessoal</label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                    <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-600">Clique para fazer upload da sua foto</p>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Logo da Empresa</label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                    <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-600">Clique para fazer upload do logo</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {/* QR Code */}
+            {cardUrl && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>QR Code</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <QRCodeGenerator url={cardUrl} />
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </div>
